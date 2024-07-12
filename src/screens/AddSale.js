@@ -243,6 +243,11 @@ export default function AddSale({navigation}) {
     }
   };
 
+  const deleteItem = (indexToDelete) => {
+    const updatedItems = items.filter((item, index) => index !== indexToDelete);
+    setItems(updatedItems);
+  };
+
   const onChangeSalesDate = (event, selectedDate) => {
     const currentDate = selectedDate || salesDate;
     setShowSalesDatePicker(false);
@@ -311,14 +316,14 @@ export default function AddSale({navigation}) {
   
     setItems([...items, newItem]);
   
-    // setselectedcategory('');
-    // setselectedSubCategory('');
-    // setName('');
-    // setQuantity('');
-    // setPrice('');
-    // setselectedgst('');
-    // setgsttye('');
-    // setcommision('');
+    setselectedcategory('');
+    setselectedSubCategory('');
+    setName('');
+    setQuantity('');
+    setPrice('');
+    setselectedgst('');
+    setgsttye('');
+    setcommision('');
   };
 
 
@@ -415,7 +420,7 @@ export default function AddSale({navigation}) {
                 <Picker.Item key={index} label={item.label} value={item.value} />
               ))}
             </Picker>
-          </View>
+          </View> 
 
           <View style={styles.pickerContainer}>
             <Picker
@@ -537,8 +542,10 @@ export default function AddSale({navigation}) {
                       {item.prod_category}
                     </Text>
                   </View>
-                  <Fontisto name="trash" size={20} color="#000" style={styles.icon} />
-                </View>
+                  <TouchableOpacity onPress={() => deleteItem(index)}>
+                  <Fontisto name="trash" size={20} color="red" style={styles.icon} />
+                  </TouchableOpacity>
+                  </View>
 
 
                 <View style={{ flexDirection: 'row', marginBottom: 5 }}>

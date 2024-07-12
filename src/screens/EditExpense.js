@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+  import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -30,7 +30,9 @@ import {
   Get_Expense_Sub__Category_Api,
   Get_Sale_Api,
   Add_Expense,
-  Customers_Api
+  Get_Expense_Detail_Api,
+  Customers_Api,
+  update_Expense
 } from '../api/authApi';
 import Toast from 'react-native-toast-message';
 import { useRoute } from '@react-navigation/native';
@@ -73,6 +75,7 @@ console.log(itemId)
       getCustomer();
       getExpenseType();
       getVendor();
+      getexpensedetails();
     }, []);
   
     const handlecustomer = (itemValue, itemIndex) => {
@@ -267,6 +270,28 @@ console.log(itemId)
         });
       }
     };
+
+    const getexpensedetails = async () => {
+      try {
+        const response = await Get_Expense_Detail_Api(itemId);
+        console.log('expenseeee', response.data);
+        if (response.msg === 'Data loaded successfully.') {
+          const expenseData = response.data[0]; 
+          console.log(expenseData.file)
+          setAmount(expenseData.amount);
+          setName(expenseData.name);
+          setNote(expenseData.note);
+          setselectedcategory(expenseData.expense_category);
+          setSelectedImage(expenseData.file);
+          setselectedcustomer(expenseData.customer_name);
+          setselectedSale(expenseData.vendor_id);
+          setreference(expenseData.ref_no);
+        } else {
+        }
+      } catch (error) {
+        console.log('Error fetching expense details:', error);
+      }
+    };
   
     const formatDate = (date) => {
       const d = new Date(date);
@@ -280,7 +305,7 @@ console.log(itemId)
   
     const Submit = async () => {
       try {
-        const response = await Add_Expense(
+        const response = await update_Expense(
           selectedcustomer,
           amount,
           selectedImage,
@@ -291,6 +316,7 @@ console.log(itemId)
           note,
           reference,
           selectedSale,
+          itemId
         );
         console.log(response);
     

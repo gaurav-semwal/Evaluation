@@ -711,62 +711,7 @@ export const Get_Expense_Api = async () => {
   }
 };
 
-export const Update_Edit_Sales = async (
-  company_id,
-  customerid,
-  prodlist,
-  duedate,
-  tax,
-  invoicedate,
-  gsttype,
-  id,
-) => {
-  try {
-    const token = await AsyncStorage.getItem('authToken');
-    console.log('Token:', token);
 
-    if (!token) {
-      throw new Error('Token not found');
-    }
-
-    const myHeaders = new Headers();
-    myHeaders.append('token', token);
-
-    const formdata = new FormData();
-    formdata.append('company_id', company_id);
-    formdata.append('customer_id', customerid);
-    formdata.append('prod_list', JSON.stringify(prodlist));
-    formdata.append('due_date', duedate);
-    formdata.append('service_tax', tax);
-    formdata.append('invoice_date', invoicedate);
-    formdata.append('gst_type_mst', gsttype);
-    formdata.append('id', id);
-
-    console.log(formdata);
-
-    const requestOptions = {
-      method: 'POST',
-      headers: myHeaders,
-      redirect: 'follow',
-      body: formdata,
-    };
-
-    const response = await fetch(`${base_url}add-sale`, requestOptions);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(
-        `Network response was not ok: ${response.statusText} - ${errorText}`,
-      );
-    }
-
-    const result = await response.json();
-    return result;
-  } catch (error) {
-    console.error('API Request Error:', error);
-    throw error;
-  }
-};
 
 export const Get_Sales_Details_Api = async id => {
   try {
@@ -790,7 +735,167 @@ export const Get_Sales_Details_Api = async id => {
       body: formdata,
     };
 
-    const response = await fetch(`${base_url}get-sale`, requestOptions);
+    const response = await fetch(`${base_url}get-sale-details`, requestOptions);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Network response was not ok: ${response.statusText} - ${errorText}`,
+      );
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+
+export const update_Expense = async (
+  customerid,
+  amount,
+  fileUri,
+  name,
+  category,
+  date,
+  payment,
+  note,
+  refno,
+  vendor,
+  id
+) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append('token', token);
+
+    const formdata = new FormData();
+    formdata.append('customer_id', customerid);
+    formdata.append('amount', amount);
+    formdata.append('file', {
+      uri: fileUri,
+      type: 'image/jpeg',
+      name: 'file.jpg',
+    });
+    formdata.append('name', name);
+    formdata.append('expense_category', category);
+    formdata.append('expense_date', date);
+    formdata.append('payment_mode', payment);
+    formdata.append('note', note);
+    formdata.append('ref_no', refno);
+    formdata.append('vendor_id', vendor);
+    formdata.append('expense_type', '');
+    formdata.append('invoice_id', '');
+    formdata.append('trans_id', '');
+    formdata.append('id', id);
+
+    console.log(formdata)
+
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: formdata,
+      redirect: 'follow',
+    };
+
+    const response = await fetch(
+      'https://billing-expertz.clikzopdevp.com/api/add-expense',
+      requestOptions,
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(
+        `Network response was not ok: ${response.statusText} - ${errorText}`,
+      );
+    }
+
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+
+export const Get_Expense_Detail_Api = async (id) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    console.log('Token:', token);
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("token", token);
+
+    const formdata = new FormData();
+    formdata.append("id", id);
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      redirect: "follow",
+      body: formdata,
+    };
+
+    const response = await fetch(`${base_url}get-expense-details`, requestOptions);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Network response was not ok: ${response.statusText} - ${errorText}`);
+    }
+
+    const result = await response.json();
+    return result;
+
+  } catch (error) {
+    console.error('API Request Error:', error);
+    throw error;
+  }
+};
+
+
+export const Update_Edit_Sales = async (customerid, prodlist, duedate, tax, invoicedate, gsttype,id) => {
+  try {
+    const token = await AsyncStorage.getItem('authToken');
+    console.log('Token:', token);
+
+    if (!token) {
+      throw new Error('Token not found');
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append('token', token);
+
+    const formdata = new FormData();
+    formdata.append("customer_id", customerid);
+    formdata.append("prod_list", JSON.stringify(prodlist));
+    formdata.append("due_date", duedate);
+    formdata.append("service_tax", tax);
+    formdata.append("invoice_date", invoicedate);
+    formdata.append("gst_type_mst", gsttype);
+    formdata.append("id", id);
+
+    console.log(formdata)
+
+    const requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      redirect: 'follow',
+      body: formdata,
+    };
+
+    const response = await fetch(
+      `${base_url}add-sale`,
+      requestOptions,
+    );
 
     if (!response.ok) {
       const errorText = await response.text();

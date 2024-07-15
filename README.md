@@ -1,79 +1,60 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Significant UI and Feature Updates
 
-# Getting Started
+This commit includes substantial updates and improvements to the UI, ensuring responsiveness across both platforms. Additionally, new API endpoints have been integrated, and various features have been enhanced for a better user experience.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+## Detailed Changes
 
-## Step 1: Start the Metro Server
+### UI Enhancements
+- **Responsive Design**: Made all screens responsive for both platforms (iOS and Android).
+- **Settings Screen**: Updated to allow users to select their profile image.
+- **Profile Picture**: Display initials on the profile picture area when no image is available.
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+### New API Integrations
+- **Expense Sales Management**: Added new APIs for managing expense sales and adding sales.
+- **User Data Management**: Enabled edit and delete functionalities for saved user data.
 
-To start Metro, run the following command from the _root_ of your React Native project:
+### Profile and Settings Updates
+- **Profile Image Selection**: Users can now select their profile image.
+- **Initials Generation**: Automatically generate profile initials from the first name and surname if no image is provided.
 
-```bash
-# using npm
-npm start
+### Wallet Enhancements
+- **Balance Display**: Display the remaining balance of the user's wallet in the top right corner of the header.
+- **Wallet Ledger**: In the Wallet Ledger tab, users can view their total expenses from a selected date range, including credit and debit amounts.
 
-# OR using Yarn
-yarn start
-```
+### Bug Fixes and Performance Improvements
+- **Minor Bugs**: Fixed various minor bugs to improve the overall performance and stability of the app.
 
-## Step 2: Start your Application
+## Additional Notes
+- **Profile Icon**: Updated the profile icon on the settings screen.
+- **User Experience**: Enhanced user experience by providing more intuitive and user-friendly features.
+- **Functionality and Responsiveness**: Improved the overall functionality and responsiveness of the app.
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+# About Me
+- **Authorship**: All code written by **GAURAV SEMWAL**.
 
-### For Android
+---
 
-```bash
-# using npm
-npm run android
+This update ensures that the app not only looks better across different devices but also provides more robust and useful features for managing user data and financial transactions.
 
-# OR using Yarn
-yarn android
-```
+---
 
-### For iOS
+## Screenshots
 
-```bash
-# using npm
-npm run ios
+1. <img src="https://github.com/user-attachments/assets/3f4ba68c-cd9a-422f-837a-da4dc8973565" alt="Screenshot 1" width="250">
+   - This screenshot shows the updated Settings screen with profile image selection.
 
-# OR using Yarn
-yarn ios
-```
+2. <img src="https://github.com/user-attachments/assets/89c25bbb-0b03-4247-b3d9-ac71ab61780b" alt="Screenshot 2" width="250">
+   - Here's a snapshot of the Wallet Ledger tab displaying total expenses.
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+3. <img src="https://github.com/user-attachments/assets/8eac51d9-7820-4e64-8552-27272b81d06d" alt="Screenshot 3" width="250">
+   - A glimpse of the UI improvements across various screens.
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+4. <img src="https://github.com/user-attachments/assets/ba45bb9f-fa9e-476f-b8a8-3f9fccd99611" alt="Screenshot 4" width="250">
+   - Updated profile icon and initials display on the profile picture area.
 
-## Step 3: Modifying your App
+5. <img src="https://github.com/user-attachments/assets/a7a15bf6-45ba-41e7-9f18-c938ade147af" alt="Screenshot 5" width="250">
+   - New APIs integrated for managing expense sales and user data.
 
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+6. <img src="https://github.com/user-attachments/assets/60847be9-9c50-4e20-8169-a210a527aa07" alt="Screenshot 6" width="250">
+   - Enhanced responsiveness across different platforms.
+---

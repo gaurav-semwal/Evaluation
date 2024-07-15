@@ -18,6 +18,7 @@ const Settingsscreen = ({navigation}) => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [mobile, setMobile] = useState('');
+  const [profileImage, setProfileImage] = useState('');
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -25,11 +26,13 @@ const Settingsscreen = ({navigation}) => {
         const storedUsername = await AsyncStorage.getItem('Username');
         const storedEmail = await AsyncStorage.getItem('email');
         const storedMobile = await AsyncStorage.getItem('mobile');
+        const storedProfileImage = await AsyncStorage.getItem('profileImage'); // Assuming profile image URL is stored
 
         if (storedUsername && storedEmail && storedMobile) {
           setUsername(storedUsername);
           setEmail(storedEmail);
           setMobile(storedMobile);
+          setProfileImage(storedProfileImage); // Update profile image state
         }
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -69,14 +72,26 @@ const Settingsscreen = ({navigation}) => {
     navigatescreen(); // Navigate to login screen
   };
 
+  const getInitials = (name) => {
+    const nameArray = name.split(' ');
+    const initials = nameArray.map(n => n[0]).join('');
+    return initials.toUpperCase();
+  };
+
   return (
     <View style={styles.container}>
       <Pressable style={styles.profileContainer} onPress={Profile}>
         <View style={styles.imagecontent}>
-          <Image
-            style={styles.profileImage}
-            source={require('../assets/Images/sem.jpeg')}
-          />
+          {profileImage ? (
+            <Image
+              style={styles.profileImage}
+              source={{uri: profileImage}}
+            />
+          ) : (
+            <View style={styles.initialsContainer}>
+              <Text style={styles.initialsText}>{getInitials(username)}</Text>
+            </View>
+          )}
           <View style={styles.profileInfo}>
             <Text style={styles.infoText}>{username}</Text>
             <Text style={styles.infoText}>{mobile}</Text>
@@ -233,6 +248,19 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     borderWidth: 3,
     borderColor: Colors.Dusk_Blue,
+  },
+  initialsContainer: {
+    height: 100,
+    width: 100,
+    borderRadius: 50,
+    backgroundColor: Colors.Dusk_Blue,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  initialsText: {
+    color: Colors.White,
+    fontSize: 50,
+    fontWeight: 'bold',
   },
   profileInfo: {
     marginLeft: 15,

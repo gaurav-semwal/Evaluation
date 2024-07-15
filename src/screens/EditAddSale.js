@@ -14,22 +14,26 @@ import Fontisto from 'react-native-vector-icons/Fontisto';
 import Button from '../components/Button';
 import {NavigationContainer} from '@react-navigation/native';
 import {
-  Get_Expense_Sub__Category_Api,
-  Get_Expense_Category_Api,
-  Get_GST_Api,
   Customers_Api,
-  Update_Edit_Sales,
   Get_Sales_Details_Api,
+  Get_GST_Api,
+  Update_Edit_Sales,
   Get_Company_Api,
+  Delete_item_Api,
+  Category_Api,
+  Sub_Category_Api,
 } from '../api/authApi';
 import Toast from 'react-native-toast-message';
 import {useRoute} from '@react-navigation/native';
 
-export default function EditAllSale({navigation}) {
+export default function Editinvoice({navigation}) {
   const route = useRoute();
   const {itemId} = route.params;
   console.log(itemId);
+  const [billed, setBilled] = useState('');
+  const [company, setCompnay] = useState([]);
 
+  const [selectedCompany, setselectedCompany] = useState(false);
   const [tcs, setTcs] = useState('');
   const [Gst, setgst] = useState([]);
   const [selectedgst, setselectedgst] = useState('');
@@ -50,12 +54,9 @@ export default function EditAllSale({navigation}) {
   const [showDueDatePicker, setShowDueDatePicker] = useState(false);
   const [Gsttype, setgsttye] = useState('');
   const [items, setItems] = useState([]);
-  const [selectedCompany, setselectedCompany] = useState(false);
-  const [company, setCompnay] = useState([]);
-  const [billed, setBilled] = useState('');
-
-
-
+  const handlecustomer = (itemValue, itemIndex) => {
+    setselectedcustomer(itemValue);
+  };
 
   const dummyTCSData = [
     {label: '0.00', value: '0'},
@@ -80,6 +81,11 @@ export default function EditAllSale({navigation}) {
     setSalesDate(currentDate);
   };
 
+  const handleCompany = (itemValue, itemIndex) => {
+    console.log(itemValue);
+    setselectedCompany(itemValue);
+  };
+
   const onChangeDueDate = (event, selectedDate) => {
     const currentDate = selectedDate || dueDate;
     setShowDueDatePicker(false);
@@ -102,6 +108,8 @@ export default function EditAllSale({navigation}) {
     return `${year}-${month}-${day}`;
   };
 
+ 
+
   useEffect(() => {
     getCompnay();
     getExpenseCategory();
@@ -110,6 +118,32 @@ export default function EditAllSale({navigation}) {
     getinvoice();
   }, []);
 
+
+  const getCompnay = async () => {
+    try {
+      const response = await Get_Company_Api();
+      console.log(response.data);
+      if (response.msg === 'Data loaded successfully.') {
+        setCompnay(response.data);
+        Toast.show({
+          text1: 'User login successful',
+          type: 'success',
+        });
+      } else {
+        Toast.show({
+          text1: 'Failed to login!',
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.log('Login Error:', error);
+      Toast.show({
+        text1: 'Error',
+        type: 'error',
+      });
+    }
+  };
+
   const getinvoice = async () => {
     try {
       const response = await Get_Sales_Details_Api(itemId);
@@ -117,6 +151,8 @@ export default function EditAllSale({navigation}) {
       if (response.msg === 'Data loaded successfully.') {
         const leadData = response.data.order_mst;
 
+        setBilled(leadData.is_billed === 'Billed' ? 'billed' : 'not_billed');
+setselectedCompany(leadData.company_id)
         setselectedcustomer(leadData.customer_id);
 
         // Set sales and due date
@@ -131,6 +167,7 @@ export default function EditAllSale({navigation}) {
 
         // Set items (assuming order_det is an array)
         setItems(response.data.order_det);
+        setPrice(response.data.order_det[0].price);
       } else {
         Toast.show({
           text1: 'Failed to load invoice details!',
@@ -145,13 +182,7 @@ export default function EditAllSale({navigation}) {
       });
     }
   };
-  const handlecustomer = (itemValue, itemIndex) => {
-    setselectedcustomer(itemValue);
-  };
-const handleCompany = (itemValue, itemIndex) => {
-    console.log(itemValue);
-    setselectedCompany(itemValue);
-  };
+
   const getCustomer = async () => {
     try {
       const response = await Customers_Api();
@@ -190,7 +221,7 @@ const handleCompany = (itemValue, itemIndex) => {
 
   const getExpenseCategory = async () => {
     try {
-      const response = await Get_Expense_Category_Api();
+      const response = await Category_Api();
       console.log(response.data);
       if (response.msg === 'Data loaded successfully.') {
         setCategory(response.data);
@@ -229,34 +260,10 @@ const handleCompany = (itemValue, itemIndex) => {
       });
     }
   };
-  const getCompnay = async () => {
-    try {
-      const response = await Get_Company_Api();
-      console.log(response.data);
-      if (response.msg === 'Data loaded successfully.') {
-        setCompnay(response.data);
-        Toast.show({
-          text1: 'User login successful',
-          type: 'success',
-        });
-      } else {
-        Toast.show({
-          text1: 'Failed to login!',
-          type: 'error',
-        });
-      }
-    } catch (error) {
-      console.log('Login Error:', error);
-      Toast.show({
-        text1: 'Error',
-        type: 'error',
-      });
-    }
-  };
 
   const getExpenseSubCategory = async itemValue => {
     try {
-      const response = await Get_Expense_Sub__Category_Api(itemValue);
+      const response = await Sub_Category_Api(itemValue);
       console.log(response.data);
       if (response.msg === 'Data loaded successfully.') {
         setSubCategory(response.data);
@@ -276,11 +283,12 @@ const handleCompany = (itemValue, itemIndex) => {
   };
 
   const updateInvoice = async () => {
-    console.log(selectedCompany, selectedcustomer, salesDate, dueDate, tcs, Gst2, items, itemId);
+    console.log(selectedCompany,selectedcustomer, salesDate, dueDate, tcs, Gst2, items, itemId);
 
     try {
       const response = await Update_Edit_Sales(
         selectedCompany,
+      
         selectedcustomer,
         items,
         formatDate(dueDate),
@@ -349,7 +357,7 @@ const handleCompany = (itemValue, itemIndex) => {
       price: price,
       gst: selectedGstObject ? selectedGstObject.gst : '',
       gst_type: Gsttype,
-      commision: commision, // Include commission here
+      commision: commision,
     };
 
     setItems([...items, newItem]);
@@ -364,35 +372,55 @@ const handleCompany = (itemValue, itemIndex) => {
     setcommision('');
   };
 
-  const deleteItem = indexToDelete => {
+  const deleteItem =async (indexToDelete) => {
+    console.log('semwal delete', indexToDelete)
+    try {
+      const response = await Delete_item_Api(items[indexToDelete].id);
+      console.log(response.data);
+      if (response.msg === 'Delete Successfully.') {
+    setItems();
+      } else {
+      }
+    } catch (error) {
+      console.log('Login Error:', error);
+      Toast.show({
+        text1: 'Error',
+        type: 'error',
+      });
+    }
+
     const updatedItems = items.filter((item, index) => index !== indexToDelete);
+    console.log('UPDATE',updatedItems)
     setItems(updatedItems);
   };
 
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={billed}
-              style={styles.picker}
-              onValueChange={(itemValue, itemIndex) => setBilled(itemValue)}>
-              <Picker.Item label="Select Billed / Not Billed" value="" />
-              <Picker.Item label="Billed" value="billed" />
-              <Picker.Item label="Not Billed" value="not_billed" />
-            </Picker>
-          </View>
-      <View style={styles.pickerContainer}>
-            <Picker
-              selectedValue={selectedCompany}
-              style={styles.picker}
-              onValueChange={handleCompany}>
-              <Picker.Item label="Select Company" value="" />
-              {company.map((src, index) => (
-                <Picker.Item key={index} label={src.name} value={src.id} />
-              ))}
-            </Picker>
-          </View>
+      <Text style={styles.expensesCategory}>Add Sale</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={billed}
+            style={styles.picker}
+            onValueChange={(itemValue, itemIndex) => setBilled(itemValue)}>
+            <Picker.Item label="Select Billed / Not Billed" value="" />
+            <Picker.Item label="Billed" value="billed" />
+            <Picker.Item label="Not Billed" value="not_billed" />
+          </Picker>
+        </View>
+
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedCompany}
+            style={styles.picker}
+            onValueChange={handleCompany}>
+            <Picker.Item label="Select Company" value="" />
+            {company.map((src, index) => (
+              <Picker.Item key={index} label={src.name} value={src.id} />
+            ))}
+          </Picker>
+        </View>
+
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={selectedcustomer}
@@ -507,7 +535,7 @@ const handleCompany = (itemValue, itemIndex) => {
             onValueChange={handleExpenseSubCategory}>
             <Picker.Item label="Select Sub Category" value="" />
             {subCategory.map((src, index) => (
-              <Picker.Item key={index} label={src.name} value={src.name} />
+              <Picker.Item key={index} label={src.name} value={src.id} />
             ))}
           </Picker>
         </View>
@@ -568,95 +596,79 @@ const handleCompany = (itemValue, itemIndex) => {
           onChangeText={setcommision}
         />
 
-        {items.length > 0 &&
-          items.map((item, index) => (
-            <View key={index} style={styles.itemContainer1}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <View style={{flexDirection: 'row', marginBottom: 5}}>
-                  <Text style={{fontWeight: '600'}}>Category:</Text>
-                  <Text
-                    style={{fontWeight: '700', color: 'black', fontSize: 15}}>
-                    {' '}
-                    {item.prod_category}
-                  </Text>
-                </View>
-                <TouchableOpacity onPress={() => deleteItem(index)}>
-                  <Fontisto
-                    name="trash"
-                    size={20}
-                    color="#000"
-                    style={styles.icon}
-                  />
-                </TouchableOpacity>
-              </View>
+{items.length > 0 && (
+  <View style={styles.itemContainer1}>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+        <Text style={{ fontWeight: '600' }}>Category:</Text>
+        <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
+          {' '}
+          {items[items.length - 1].prod_category}
+        </Text>
+      </View>
+      <TouchableOpacity onPress={() => deleteItem(items.length - 1)}>
+        <Fontisto name="trash" size={20} color="#000" style={styles.icon} />
+      </TouchableOpacity>
+    </View>
 
-              <View style={{flexDirection: 'row', marginBottom: 5}}>
-                <Text style={{fontWeight: '600'}}>Sub Category: </Text>
-                <Text style={{fontWeight: '700', color: 'black', fontSize: 15}}>
-                  {' '}
-                  {item.prod_subcategory}
-                </Text>
-              </View>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                <View style={{flexDirection: 'row', marginBottom: 5}}>
-                  <Text style={{fontWeight: '600'}}>Price:</Text>
-                  <Text
-                    style={{fontWeight: '700', color: 'black', fontSize: 15}}>
-                    {' '}
-                    {item.price}
-                  </Text>
-                </View>
-                <View style={{flexDirection: 'row', marginBottom: 5}}>
-                  <Text style={{fontWeight: '600'}}>Quantity:</Text>
-                  <Text
-                    style={{fontWeight: '700', color: 'black', fontSize: 15}}>
-                    {' '}
-                    {item.qty}
-                  </Text>
-                </View>
-              </View>
+    <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+      <Text style={{ fontWeight: '600' }}>Sub Category:</Text>
+      <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
+        {' '}
+        {items[items.length - 1].prod_subcategory}
+      </Text>
+    </View>
 
-              <View style={{flexDirection: 'row', marginBottom: 5}}>
-                <Text style={{fontWeight: '600'}}>GST:</Text>
-                <Text style={{fontWeight: '700', color: 'black', fontSize: 15}}>
-                  {' '}
-                  {item.gst}
-                </Text>
-              </View>
-              <View style={{flexDirection: 'row', marginBottom: 5}}>
-                <Text style={{fontWeight: '600'}}>Commision:</Text>
-                <Text style={{fontWeight: '700', color: 'black', fontSize: 15}}>
-                  {' '}
-                  {item.commision}
-                </Text>
-              </View>
-              <View style={{flexDirection: 'row', marginBottom: 5}}>
-                <Text style={{fontWeight: '600'}}>Description:</Text>
-                <Text style={{fontWeight: '700', color: 'black', fontSize: 15}}>
-                  {' '}
-                  {item.description}
-                </Text>
-              </View>
+    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+      <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+        <Text style={{ fontWeight: '600' }}>Price:</Text>
+        <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
+          {' '}
+          {items[items.length - 1].price}
+        </Text>
+      </View>
+      <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+        <Text style={{ fontWeight: '600' }}>Quantity:</Text>
+        <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
+          {' '}
+          {items[items.length - 1].qty}
+        </Text>
+      </View>
+    </View>
 
-              <View style={{flexDirection: 'row', marginBottom: 5}}>
-                <Text style={{fontWeight: '600'}}>GST Type:</Text>
-                <Text style={{fontWeight: '700', color: 'black', fontSize: 15}}>
-                  {' '}
-                  {item.gst_type}
-                </Text>
-              </View>
-            </View>
-          ))}
+    <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+      <Text style={{ fontWeight: '600' }}>GST:</Text>
+      <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
+        {' '}
+        {items[items.length - 1].gst}
+      </Text>
+    </View>
+
+    <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+      <Text style={{ fontWeight: '600' }}>Commission:</Text>
+      <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
+        {' '}
+        {items[items.length - 1].commision}
+      </Text>
+    </View>
+
+    <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+      <Text style={{ fontWeight: '600' }}>Description:</Text>
+      <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
+        {' '}
+        {items[items.length - 1].description}
+      </Text>
+    </View>
+
+    <View style={{ flexDirection: 'row', marginBottom: 5 }}>
+      <Text style={{ fontWeight: '600' }}>GST Type:</Text>
+      <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
+        {' '}
+        {items[items.length - 1].gst_type}
+      </Text>
+    </View>
+  </View>
+)}
 
         <Button title="Submit" onPress={updateInvoice} />
       </ScrollView>
@@ -727,7 +739,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#e8effa',
+    backgroundColor: '#aac6f2',
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,

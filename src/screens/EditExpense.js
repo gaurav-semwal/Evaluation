@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+  import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -24,13 +24,13 @@ import Button from '../components/Button';
 import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
 import { useNavigation } from '@react-navigation/native';
 import {
-  Category_Api,
   Get_Vendor_Labour_Api,
   Get_Expense_Category_Api,
   Get_Expense_Sub__Category_Api,
   Get_Sale_Api,
-  Add_Expense,
-  Customers_Api
+  Get_Expense_Detail_Api,
+  Customers_Api,
+  update_Expense
 } from '../api/authApi';
 import Toast from 'react-native-toast-message';
 import { useRoute } from '@react-navigation/native';
@@ -63,16 +63,19 @@ console.log(itemId)
     const [selectedSale, setselectedSale] = useState('');
     const [selectedExpenseType, setselectedExpenseType] = useState('');
     const [reference, setreference] = useState('')
+    const [vendor, setVendor] = useState('');
+    const [labour, setLabour] = useState('');
+    const [expenseData, setExpenseData] = useState([]);
   
     useEffect(() => {
       requestCameraPermission();
     }, []);
   
     useEffect(() => {
-      getCategory();
       getCustomer();
+      getExpenseCategory();
       getExpenseType();
-      getVendor();
+      getexpensedetails();
     }, []);
   
     const handlecustomer = (itemValue, itemIndex) => {
@@ -96,9 +99,10 @@ console.log(itemId)
       setselectedSale(itemValue);
     };
   
-    const handleExpenseType = (itemValue, itemIndex) => {
-      console.log(itemValue)
+    const handleExpenseType = itemValue => {
       setselectedExpenseType(itemValue);
+      setExpenseType(itemValue);
+      getExpenseType(itemValue);
     };
   
     const getCustomer = async () => {
@@ -122,47 +126,47 @@ console.log(itemId)
       }
     };
   
-    const getVendor = async () => {
-      try {
-        const response = await Get_Vendor_Labour_Api();
-        console.log('vendor', response.data);
-        if (response.msg === 'Data loaded successfully.') {
-          setSale(response.data);
-        } else {
-          Toast.show({
-            text1: 'Failed to login!',
-            type: 'error',
-          });
-        }
-      } catch (error) {
-        console.log('Login Error:', error);
-        Toast.show({
-          text1: 'Error',
-          type: 'error',
-        });
-      }
-    };
+    // const getVendor = async () => {
+    //   try {
+    //     const response = await Get_Vendor_Labour_Api();
+    //     console.log('vendor', response.data);
+    //     if (response.msg === 'Data loaded successfully.') {
+    //       setSale(response.data);
+    //     } else {
+    //       Toast.show({
+    //         text1: 'Failed to login!',
+    //         type: 'error',
+    //       });
+    //     }
+    //   } catch (error) {
+    //     console.log('Login Error:', error);
+    //     Toast.show({
+    //       text1: 'Error',
+    //       type: 'error',
+    //     });
+    //   }
+    // };
   
-    const getCategory = async () => {
-      try {
-        const response = await Category_Api();
-        console.log(response.data);
-        if (response.msg === 'Data loaded successfully.') {
-          setCategory(response.data);
-        } else {
-          Toast.show({
-            text1: 'Failed to login!',
-            type: 'error',
-          });
-        }
-      } catch (error) {
-        console.log('Login Error:', error);
-        Toast.show({
-          text1: 'Error',
-          type: 'error',
-        });
-      }
-    };
+    // const getCategory = async () => {
+    //   try {
+    //     const response = await Category_Api();
+    //     console.log(response.data);
+    //     if (response.msg === 'Data loaded successfully.') {
+    //       setCategory(response.data);
+    //     } else {
+    //       Toast.show({
+    //         text1: 'Failed to login!',
+    //         type: 'error',
+    //       });
+    //     }
+    //   } catch (error) {
+    //     console.log('Login Error:', error);
+    //     Toast.show({
+    //       text1: 'Error',
+    //       type: 'error',
+    //     });
+    //   }
+    // };
   
     const getExpenseCategory = async () => {
       try {
@@ -174,7 +178,6 @@ console.log(itemId)
             text1: 'User login successful',
             type: 'success',
           });
-          // navigation.navigate('Bottom');
         } else {
           Toast.show({
             text1: 'Failed to login!',
@@ -247,12 +250,11 @@ console.log(itemId)
         const response = await Get_Vendor_Labour_Api(itemValue);
         console.log(response.data);
         if (response.msg === 'Data loaded successfully.') {
-          setExpenseType(response.data);
+          setExpenseData(response.data);
           Toast.show({
             text1: 'User login successful',
             type: 'success',
           });
-  
         } else {
           Toast.show({
             text1: 'Failed to login!',
@@ -265,6 +267,34 @@ console.log(itemId)
           text1: 'Error',
           type: 'error',
         });
+      }
+    };
+
+    const getexpensedetails = async () => {
+      try {
+        const response = await Get_Expense_Detail_Api(itemId);
+        console.log('expenseeee SEMWAL', response.data);
+        if (response.msg === 'Data loaded successfully.') {
+          const expenseData = response.data[0];
+          const baseURL = 'https://project-evaluation.clikzopdevp.com/api'; // Replace with your actual base URL
+          const imageURL = `${baseURL}/${expenseData.file.replace('../', '')}`;
+          console.log(imageURL);
+          setSelectedImage(imageURL);
+          setAmount(expenseData.amount);
+          setName(expenseData.name);
+          setNote(expenseData.note);
+          setselectedcategory(expenseData.expense_category);
+          setselectedSubCategory(expenseData.expense_subcategory);
+          setselectedcustomer(expenseData.ids);
+          setselectedSale(expenseData.invoice_id)
+          setExpenseType(expenseData.expense_type);
+          setselectedExpenseType(expenseData.vendor_id);
+          setreference(expenseData.ref_no);
+        setBilled(expenseData.payment_mode);
+        } else {
+        }
+      } catch (error) {
+        console.log('Error fetching expense details:', error);
       }
     };
   
@@ -280,7 +310,7 @@ console.log(itemId)
   
     const Submit = async () => {
       try {
-        const response = await Add_Expense(
+        const response = await update_Expense(
           selectedcustomer,
           amount,
           selectedImage,
@@ -291,6 +321,7 @@ console.log(itemId)
           note,
           reference,
           selectedSale,
+          itemId
         );
         console.log(response);
     
@@ -441,7 +472,7 @@ console.log(itemId)
               ))}
             </Picker>
           </View>
-          {/* 
+          
           <View style={styles.pickerContainer}>
             <Picker
               selectedValue={selectedSubCategory}
@@ -452,7 +483,7 @@ console.log(itemId)
                 <Picker.Item key={index} label={src.name} value={src.name} />
               ))}
             </Picker>
-          </View> */}
+          </View>
   
           <View style={styles.pickerContainer}>
             <TouchableOpacity
@@ -496,29 +527,81 @@ console.log(itemId)
               ))}
             </Picker>
           </View>
+
+
+          <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={selectedSale}
+            style={styles.picker}
+            onValueChange={handleSale}>
+            <Picker.Item label="Select Sale" value="" />
+            {sale.map((src, index) => (
+              <Picker.Item key={index} label={src.invoice} value={src.id} />
+            ))}
+          </Picker>
+        </View>
   
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={expenseType}
+            style={styles.picker}
+            onValueChange={handleExpenseType}>
+            <Picker.Item label="Select Expense Type" value="" />
+            <Picker.Item label="Vendor" value="vendor" />
+            <Picker.Item label="Labour" value="labour" />
+            <Picker.Item label="TA/DA" value="ta/da" />
+          </Picker>
+        </View>
+
+        {selectedExpenseType === 'vendor' && (
           <View style={styles.pickerContainer}>
             <Picker
-              selectedValue={selectedSale}
+              selectedValue={selectedExpenseType}
               style={styles.picker}
-              onValueChange={handleSale}>
-              <Picker.Item label="Select Vender" value="" />
-              {sale.map((src, index) => (
-                <Picker.Item key={index} label={src.name} value={src.id} />
+              onValueChange={itemValue => setselectedExpenseType(itemValue)}>
+              <Picker.Item label="Select Vendor" value="" />
+              {expenseData.map((vendor, index) => (
+                <Picker.Item
+                  key={index}
+                  label={vendor.name}
+                  value={vendor.id}
+                />
               ))}
             </Picker>
           </View>
-  
+        )}
+
+        {selectedExpenseType === 'labour' && (
           <View style={styles.pickerContainer}>
             <Picker
-              selectedValue={billed}
+              selectedValue={labour}
               style={styles.picker}
-              onValueChange={(itemValue, itemIndex) => setBilled(itemValue)}>
-              <Picker.Item label="Bank Transfer" value="" />
-              <Picker.Item label="Cheque" value="billed" />
-              <Picker.Item label="Cash" value="not_billed" />
+              onValueChange={itemValue => setLabour(itemValue)}>
+              <Picker.Item label="Select Labour" value="" />
+              {expenseData.map((labour, index) => (
+                <Picker.Item
+                  key={index}
+                  label={labour.name}
+                  value={labour.name}
+                />
+              ))}
             </Picker>
           </View>
+        )}
+  
+          <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={billed}
+            style={styles.picker}
+            onValueChange={(itemValue, itemIndex) => setBilled(itemValue)}>
+            <Picker.Item label="Select Payment Mode " value="" />
+            <Picker.Item label="Bank Transfer" value="Bank Transfer" />
+            <Picker.Item label="Cheque" value="Cheque" />
+            <Picker.Item label="Cash" value="Cash" />
+          </Picker>
+          </View>
+
+
   
           <TextInput
             label="Enter Reference Number"

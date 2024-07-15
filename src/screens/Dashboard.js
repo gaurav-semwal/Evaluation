@@ -206,9 +206,9 @@ const Dashboard = ({navigation}) => {
             <Text style={styles.text1}> {item.vendor_name}</Text>
           </View>
           <View style={{flexDirection: 'row'}}>
-                  <Text style={styles.detailText}>Build : </Text>
-                  <Text style={styles.text1}>{item.build}</Text>
-                </View>
+            <Text style={styles.detailText}>Build : </Text>
+            <Text style={styles.text1}>{item.build}</Text>
+          </View>
           <View style={{flexDirection: 'row'}}>
             <Text style={styles.detailText}>Expenses Type :</Text>
             <Text style={styles.text1}> {item.expense_type}</Text>

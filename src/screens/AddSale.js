@@ -523,7 +523,7 @@ export default function AddSale({navigation}) {
           </View>
 
           <TextInput
-            label="Enter Customer Per Qty"
+            label="Enter Commission Per Qty"
             mode="outlined"
             style={styles.input}
             keyboardType='numeric'

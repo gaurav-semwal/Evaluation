@@ -229,7 +229,7 @@ const Dashboard = ({navigation}) => {
   );
 
   const naviagteinvoice = async () => {
-    navigation.navigate('All Sales');
+    navigation.navigate('Add Sales');
   };
 
   const naviagteexpence = async () => {

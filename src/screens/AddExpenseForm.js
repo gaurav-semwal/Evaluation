@@ -189,7 +189,7 @@ export default function AddExpenseForm() {
   const getSale = async itemValue => {
     try {
       const response = await Get_Sale_Api(itemValue);
-      // console.log('resssssssss',response.data);
+      console.log('resssssssss',response.data);
       if (response.msg === 'Data loaded successfully.') {
         setSale(response.data);
         Toast.show({

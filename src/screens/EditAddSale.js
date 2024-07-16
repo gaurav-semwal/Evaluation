@@ -31,7 +31,7 @@ export default function Editinvoice({navigation}) {
   const {itemId} = route.params;
   console.log(itemId);
   const [billed, setBilled] = useState('');
-  const [company, setCompnay] = useState([]);
+  const [company, setCompany] = useState([]);
 
   const [selectedCompany, setselectedCompany] = useState(false);
   const [tcs, setTcs] = useState('');
@@ -54,9 +54,6 @@ export default function Editinvoice({navigation}) {
   const [showDueDatePicker, setShowDueDatePicker] = useState(false);
   const [Gsttype, setgsttye] = useState('');
   const [items, setItems] = useState([]);
-  const handlecustomer = (itemValue, itemIndex) => {
-    setselectedcustomer(itemValue);
-  };
 
   const dummyTCSData = [
     {label: '0.00', value: '0'},
@@ -75,70 +72,29 @@ export default function Editinvoice({navigation}) {
     {label: 'Exclude', value: 'Exclude'},
   ];
 
-  const onChangeSalesDate = (event, selectedDate) => {
-    const currentDate = selectedDate || salesDate;
-    setShowSalesDatePicker(false);
-    setSalesDate(currentDate);
-  };
-
-  const handleCompany = (itemValue, itemIndex) => {
-    console.log(itemValue);
-    setselectedCompany(itemValue);
-  };
-
-  const onChangeDueDate = (event, selectedDate) => {
-    const currentDate = selectedDate || dueDate;
-    setShowDueDatePicker(false);
-    setDueDate(currentDate);
-  };
-
-  const showSalesDatePickerHandler = () => {
-    setShowSalesDatePicker(true);
-  };
-
-  const showDueDatePickerHandler = () => {
-    setShowDueDatePicker(true);
-  };
-
-  const formatDate = date => {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
- 
-
   useEffect(() => {
-    getCompnay();
+    getCompany();
     getExpenseCategory();
     getgst();
     getCustomer();
     getinvoice();
   }, []);
 
-
-  const getCompnay = async () => {
+  const getCompany = async () => {
     try {
       const response = await Get_Company_Api();
-      console.log(response.data);
       if (response.msg === 'Data loaded successfully.') {
-        setCompnay(response.data);
-        Toast.show({
-          text1: 'User login successful',
-          type: 'success',
-        });
+        setCompany(response.data);
       } else {
         Toast.show({
-          text1: 'Failed to login!',
+          text1: 'Failed to load companies!',
           type: 'error',
         });
       }
     } catch (error) {
-      console.log('Login Error:', error);
+      console.log('Error:', error);
       Toast.show({
-        text1: 'Error',
+        text1: 'Error fetching companies!',
         type: 'error',
       });
     }
@@ -150,22 +106,15 @@ export default function Editinvoice({navigation}) {
       console.log('gettttttttttt', response.data);
       if (response.msg === 'Data loaded successfully.') {
         const leadData = response.data.order_mst;
-
         setBilled(leadData.is_billed === 'Billed' ? 'billed' : 'not_billed');
-setselectedCompany(leadData.company_id)
+        setselectedCompany(leadData.company_id);
         setselectedcustomer(leadData.customer_id);
-
-        // Set sales and due date
         const salesDateValue = new Date(leadData.invoice_date);
         const dueDateValue = new Date(leadData.due_date);
         setSalesDate(salesDateValue);
         setDueDate(dueDateValue);
-
-        // Set TCS and GST type
         setTcs(leadData.service_tax);
         setGst2(leadData.gst_type);
-
-        // Set items (assuming order_det is an array)
         setItems(response.data.order_det);
         setPrice(response.data.order_det[0].price);
       } else {
@@ -191,17 +140,116 @@ setselectedCompany(leadData.company_id)
         setCustomer(response.data);
       } else {
         Toast.show({
-          text1: 'Failed to login!',
+          text1: 'Failed to load customers!',
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.log('Error:', error);
+      Toast.show({
+        text1: 'Error fetching customers!',
+        type: 'error',
+      });
+    }
+  };
+
+  const getExpenseCategory = async () => {
+    try {
+      const response = await Category_Api();
+      console.log(response.data);
+      if (response.msg === 'Data loaded successfully.') {
+        setCategory(response.data);
+      } else {
+        Toast.show({
+          text1: 'Failed to load categories!',
           type: 'error',
         });
       }
     } catch (error) {
       console.log('Login Error:', error);
       Toast.show({
-        text1: 'Error',
+        text1: 'Error fetching categories!',
         type: 'error',
       });
     }
+  };
+
+  const getgst = async () => {
+    try {
+      const response = await Get_GST_Api();
+      console.log(response.data);
+      if (response.msg === 'Data loaded successfully.') {
+        setgst(response.data);
+      } else {
+        Toast.show({
+          text1: 'Failed to load GST!',
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.log('Login Error:', error);
+      Toast.show({
+        text1: 'Error fetching GST!',
+        type: 'error',
+      });
+    }
+  };
+
+  const getExpenseSubCategory = async itemValue => {
+    try {
+      const response = await Sub_Category_Api(itemValue);
+      console.log(response.data);
+      if (response.msg === 'Data loaded successfully.') {
+        setSubCategory(response.data);
+      } else {
+        Toast.show({
+          text1: 'Failed to load subcategories!',
+          type: 'error',
+        });
+      }
+    } catch (error) {
+      console.log('Login Error:', error);
+      Toast.show({
+        text1: 'Error fetching subcategories!',
+        type: 'error',
+      });
+    }
+  };
+
+  const onChangeSalesDate = (event, selectedDate) => {
+    const currentDate = selectedDate || salesDate;
+    setShowSalesDatePicker(false);
+    setSalesDate(currentDate);
+  };
+
+  const handleCompany = (itemValue, itemIndex) => {
+    console.log(itemValue);
+    setselectedCompany(itemValue);
+  };
+  const handlecustomer = (itemValue, itemIndex) => {
+    setselectedcustomer(itemValue);
+  };
+
+  const onChangeDueDate = (event, selectedDate) => {
+    const currentDate = selectedDate || dueDate;
+    setShowDueDatePicker(false);
+    setDueDate(currentDate);
+  };
+
+  const showSalesDatePickerHandler = () => {
+    setShowSalesDatePicker(true);
+  };
+
+  const showDueDatePickerHandler = () => {
+    setShowDueDatePicker(true);
+  };
+
+  const formatDate = date => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
   const handleExpenseCategory = (itemValue, itemIndex) => {
@@ -219,76 +267,10 @@ setselectedCompany(leadData.company_id)
     setselectedgst(itemValue);
   };
 
-  const getExpenseCategory = async () => {
-    try {
-      const response = await Category_Api();
-      console.log(response.data);
-      if (response.msg === 'Data loaded successfully.') {
-        setCategory(response.data);
-      } else {
-        Toast.show({
-          text1: 'Failed to login!',
-          type: 'error',
-        });
-      }
-    } catch (error) {
-      console.log('Login Error:', error);
-      Toast.show({
-        text1: 'Error',
-        type: 'error',
-      });
-    }
-  };
-
-  const getgst = async () => {
-    try {
-      const response = await Get_GST_Api();
-      console.log(response.data);
-      if (response.msg === 'Data loaded successfully.') {
-        setgst(response.data);
-      } else {
-        Toast.show({
-          text1: 'Failed to login!',
-          type: 'error',
-        });
-      }
-    } catch (error) {
-      console.log('Login Error:', error);
-      Toast.show({
-        text1: 'Error',
-        type: 'error',
-      });
-    }
-  };
-
-  const getExpenseSubCategory = async itemValue => {
-    try {
-      const response = await Sub_Category_Api(itemValue);
-      console.log(response.data);
-      if (response.msg === 'Data loaded successfully.') {
-        setSubCategory(response.data);
-      } else {
-        Toast.show({
-          text1: 'Failed to login!',
-          type: 'error',
-        });
-      }
-    } catch (error) {
-      console.log('Login Error:', error);
-      Toast.show({
-        text1: 'Error',
-        type: 'error',
-      });
-    }
-  };
-
   const updateInvoice = async () => {
-    console.log(selectedCompany,selectedcustomer, salesDate, dueDate, tcs, Gst2, items, itemId);
-
     try {
       const response = await Update_Edit_Sales(
         selectedCompany,
-      
         selectedcustomer,
         items,
         formatDate(dueDate),
@@ -298,17 +280,15 @@ setselectedCompany(leadData.company_id)
         itemId,
       );
 
-      console.log(response);
-
       if (response.msg === 'Save Successfully.') {
         Toast.show({
           text1: 'Save successfully',
           type: 'success',
         });
-        navigation.navigate('Invoice');
+        navigation.goBack();
       } else {
         Toast.show({
-          text1: 'Failed to add lead!',
+          text1: 'Add atleast one Product!',
           type: 'error',
         });
       }
@@ -320,6 +300,45 @@ setselectedCompany(leadData.company_id)
       });
     }
   };
+
+
+  // const updateInvoice = async () => {
+  //   if (!selectedCompany || !selectedcustomer || !salesDate || !dueDate || !billed || !tcs || items.length === 0) {
+  //     Toast.show({
+  //       text1: 'Please fill all fields',
+  //       type: 'error',
+  //     });
+  //     return;
+  //   }
+
+  //   const dataToSend = {
+  //     customer_id: selectedcustomer,
+  //     is_billed: billed,
+  //     company_id: selectedCompany,
+  //     invoice_date: formatDate(salesDate),
+  //     due_date: formatDate(dueDate),
+  //     service_tax: tcs,
+  //     order_det: items,
+  //   };
+
+  //   try {
+  //     const response = await Update_Edit_Sales(itemId, dataToSend);
+  //     if (response.msg === 'Save Successfully.') {
+  //       navigation.goBack();
+  //     } else {
+  //       Toast.show({
+  //         text1: 'Failed to update invoice!',
+  //         type: 'error',
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log('Error:', error);
+  //     Toast.show({
+  //       text1: 'Error updating invoice!',
+  //       type: 'error',
+  //     });
+  //   }
+  // };
 
   const addItem = () => {
     if (
@@ -372,32 +391,58 @@ setselectedCompany(leadData.company_id)
     setcommision('');
   };
 
-  const deleteItem =async (indexToDelete) => {
-    console.log('semwal delete', indexToDelete)
+  // const deleteItem = async (indexToDelete) => {
+  //   console.log('Delete index:', indexToDelete);
+  //   try {
+  //     const response = await Delete_item_Api(items[indexToDelete].id);
+  //     console.log('Delete response:', response.data);
+  //     if (response.msg === 'Delete Successfully.') {
+  //       const updatedItems = items.filter((item, index) => index !== indexToDelete);
+  //       setItems(updatedItems);
+  //       // Check if there are no items left after deletion
+  //       if (updatedItems.length === 0) {
+  //         // Handle case where no items are left (e.g., show error message or disable submit button)
+  //         console.log('No items left after deletion');
+  //         // Example: Disable submit button or show an error message
+  //       }
+  //     } else {
+  //       // Handle delete failure if needed
+  //       console.log('Delete failed:', response.msg);
+  //     }
+  //   } catch (error) {
+  //     console.log('Delete error:', error);
+  //     // Handle delete error (e.g., show toast notification)
+  //     Toast.show({
+  //       text1: 'Error',
+  //       type: 'error',
+  //     });
+  //   }
+  // };
+
+  const deleteItem = async item => {
     try {
-      const response = await Delete_item_Api(items[indexToDelete].id);
-      console.log(response.data);
+      const response = await Delete_item_Api(item.id);
       if (response.msg === 'Delete Successfully.') {
-    setItems();
+        const updatedItems = items.filter(i => i.id !== item.id);
+        setItems(updatedItems);
       } else {
+        Toast.show({
+          text1: 'Delete failed!',
+          type: 'error',
+        });
       }
     } catch (error) {
-      console.log('Login Error:', error);
+      console.log('Error:', error);
       Toast.show({
-        text1: 'Error',
+        text1: 'Error deleting item!',
         type: 'error',
       });
     }
-
-    const updatedItems = items.filter((item, index) => index !== indexToDelete);
-    console.log('UPDATE',updatedItems)
-    setItems(updatedItems);
   };
-
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.expensesCategory}>Add Sale</Text>
+        <Text style={styles.expensesCategory}>Add Sale</Text>
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={billed}
@@ -588,87 +633,113 @@ setselectedCompany(leadData.company_id)
         </View>
 
         <TextInput
-          label="Enter Customer Per Qty"
+          label="Enter Commission Per Qty"
           mode="outlined"
           style={styles.input}
           keyboardType="numeric"
           value={commision}
           onChangeText={setcommision}
         />
+        {items.length > 0 && (
+          <View style={styles.itemContainer1}>
+            {items.map(item => (
+              <View key={item.id} style={{marginBottom: 10}}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <View style={{flexDirection: 'row', marginBottom: 5}}>
+                    <Text style={{fontWeight: '600'}}>Category:</Text>
+                    <Text
+                      style={{fontWeight: '700', color: 'black', fontSize: 15}}>
+                      {' '}
+                      {item.category}
+                    </Text>
+                  </View>
+                  <TouchableOpacity onPress={() => deleteItem(item)}>
+                    <Fontisto
+                      name="trash"
+                      size={20}
+                      color="#000"
+                      style={styles.icon}
+                    />
+                  </TouchableOpacity>
+                </View>
 
-{items.length > 0 && (
-  <View style={styles.itemContainer1}>
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-      <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-        <Text style={{ fontWeight: '600' }}>Category:</Text>
-        <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
-          {' '}
-          {items[items.length - 1].prod_category}
-        </Text>
-      </View>
-      <TouchableOpacity onPress={() => deleteItem(items.length - 1)}>
-        <Fontisto name="trash" size={20} color="#000" style={styles.icon} />
-      </TouchableOpacity>
-    </View>
+                <View style={{flexDirection: 'row', marginBottom: 5}}>
+                  <Text style={{fontWeight: '600'}}>Sub Category:</Text>
+                  <Text
+                    style={{fontWeight: '700', color: 'black', fontSize: 15}}>
+                    {' '}
+                    {item.sub_category}
+                  </Text>
+                </View>
 
-    <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-      <Text style={{ fontWeight: '600' }}>Sub Category:</Text>
-      <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
-        {' '}
-        {items[items.length - 1].prod_subcategory}
-      </Text>
-    </View>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}>
+                  <View style={{flexDirection: 'row', marginBottom: 5}}>
+                    <Text style={{fontWeight: '600'}}>Price:</Text>
+                    <Text
+                      style={{fontWeight: '700', color: 'black', fontSize: 15}}>
+                      {' '}
+                      {item.price}
+                    </Text>
+                  </View>
+                  <View style={{flexDirection: 'row', marginBottom: 5}}>
+                    <Text style={{fontWeight: '600'}}>Quantity:</Text>
+                    <Text
+                      style={{fontWeight: '700', color: 'black', fontSize: 15}}>
+                      {' '}
+                      {item.qty}
+                    </Text>
+                  </View>
+                </View>
 
-    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-      <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-        <Text style={{ fontWeight: '600' }}>Price:</Text>
-        <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
-          {' '}
-          {items[items.length - 1].price}
-        </Text>
-      </View>
-      <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-        <Text style={{ fontWeight: '600' }}>Quantity:</Text>
-        <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
-          {' '}
-          {items[items.length - 1].qty}
-        </Text>
-      </View>
-    </View>
+                <View style={{flexDirection: 'row', marginBottom: 5}}>
+                  <Text style={{fontWeight: '600'}}>GST:</Text>
+                  <Text
+                    style={{fontWeight: '700', color: 'black', fontSize: 15}}>
+                    {' '}
+                    {item.gst}
+                  </Text>
+                </View>
 
-    <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-      <Text style={{ fontWeight: '600' }}>GST:</Text>
-      <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
-        {' '}
-        {items[items.length - 1].gst}
-      </Text>
-    </View>
+                <View style={{flexDirection: 'row', marginBottom: 5}}>
+                  <Text style={{fontWeight: '600'}}>Commission:</Text>
+                  <Text
+                    style={{fontWeight: '700', color: 'black', fontSize: 15}}>
+                    {' '}
+                    {item.commision}
+                  </Text>
+                </View>
 
-    <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-      <Text style={{ fontWeight: '600' }}>Commission:</Text>
-      <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
-        {' '}
-        {items[items.length - 1].commision}
-      </Text>
-    </View>
+                <View style={{flexDirection: 'row', marginBottom: 5}}>
+                  <Text style={{fontWeight: '600'}}>Description:</Text>
+                  <Text
+                    style={{fontWeight: '700', color: 'black', fontSize: 15}}>
+                    {' '}
+                    {item.description}
+                  </Text>
+                </View>
 
-    <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-      <Text style={{ fontWeight: '600' }}>Description:</Text>
-      <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
-        {' '}
-        {items[items.length - 1].description}
-      </Text>
-    </View>
-
-    <View style={{ flexDirection: 'row', marginBottom: 5 }}>
-      <Text style={{ fontWeight: '600' }}>GST Type:</Text>
-      <Text style={{ fontWeight: '700', color: 'black', fontSize: 15 }}>
-        {' '}
-        {items[items.length - 1].gst_type}
-      </Text>
-    </View>
-  </View>
-)}
+                <View style={{flexDirection: 'row', marginBottom: 5}}>
+                  <Text style={{fontWeight: '600'}}>GST Type:</Text>
+                  <Text
+                    style={{fontWeight: '700', color: 'black', fontSize: 15}}>
+                    {' '}
+                    {item.gst_type}
+                  </Text>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
 
         <Button title="Submit" onPress={updateInvoice} />
       </ScrollView>

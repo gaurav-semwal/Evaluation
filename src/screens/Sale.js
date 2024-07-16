@@ -19,6 +19,8 @@ const Sale = ({navigation}) => {
   const [customer, setCustomer] = useState([]);
   const [selectedCustomer, setSelectedCustomer] = useState('');
   const [salesData, setSalesData] = useState([]);
+
+
   useFocusEffect(
     React.useCallback(() => {
       getCustomer();
@@ -37,7 +39,7 @@ const Sale = ({navigation}) => {
         setCustomer(response.data);
       } else {
         Toast.show({
-          text1: 'Failed to load customers!',
+          text1: response.msg,
           type: 'error',
         });
       }
@@ -58,7 +60,7 @@ const Sale = ({navigation}) => {
         setSalesData(response.data);
       } else {
         Toast.show({
-          text1: 'Failed to load invoices!',
+          text1: response.msg,
           type: 'error',
         });
       }
@@ -70,6 +72,16 @@ const Sale = ({navigation}) => {
       });
     }
   };
+
+  
+  useFocusEffect(
+    React.useCallback(() => {
+      getCustomer();
+      if (selectedCustomer) {
+        getInvoice(selectedCustomer); 
+      }
+    }, [selectedCustomer])
+  );
 
   const handleCustomer = itemValue => {
     setSelectedCustomer(itemValue);
@@ -96,7 +108,7 @@ const Sale = ({navigation}) => {
       </View>
       <View style={styles.contentbottom}>
         <View style={{flexDirection: 'row'}}>
-          <Text style={styles.invoiceText}>Builed Status : </Text>
+          <Text style={styles.invoiceText}>Billed Status : </Text>
           <Text style={styles.invoiceText1}>{item.is_billed}</Text>
         </View>
       </View>

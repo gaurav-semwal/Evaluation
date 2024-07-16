@@ -574,7 +574,7 @@ export const Get_Sales_Api = async id => {
 
     const myHeaders = new Headers();
     myHeaders.append('token', token);
-
+ 
     const formdata = new FormData();
     formdata.append('customer_id', id);
 
@@ -633,11 +633,14 @@ export const Add_Expense = async (
     const formdata = new FormData();
     formdata.append('customer_id', customer_id);
     formdata.append('amount', amount);
-    formdata.append('file', {
-      uri: fileUri,
-      type: 'image/jpeg',
-      name: 'file.jpg',
-    });
+    
+    if (fileUri) {
+      formdata.append('file', {
+        uri: fileUri,
+        type: 'image/jpeg',
+        name: 'file.jpg',
+      });
+    }
     formdata.append('name', name);
     formdata.append('expense_category', expense_category);
     formdata.append('expense_date', expense_date);
@@ -862,7 +865,7 @@ export const Get_Expense_Detail_Api = async (id) => {
 };
 
 
-export const Update_Edit_Sales = async (customerid, prodlist, duedate, tax, invoicedate, gsttype,id) => {
+export const Update_Edit_Sales = async (company_id, customerid, prodlist, duedate, tax, invoicedate, gsttype,id) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     console.log('Token:', token);
@@ -875,13 +878,14 @@ export const Update_Edit_Sales = async (customerid, prodlist, duedate, tax, invo
     myHeaders.append('token', token);
 
     const formdata = new FormData();
-    formdata.append("customer_id", customerid);
-    formdata.append("prod_list", JSON.stringify(prodlist));
-    formdata.append("due_date", duedate);
-    formdata.append("service_tax", tax);
-    formdata.append("invoice_date", invoicedate);
-    formdata.append("gst_type_mst", gsttype);
-    formdata.append("id", id);
+    formdata.append('company_id', company_id);
+    formdata.append('customer_id', customerid);
+    formdata.append('prod_list', JSON.stringify(prodlist));
+    formdata.append('due_date', duedate);
+    formdata.append('service_tax', tax);
+    formdata.append('invoice_date', invoicedate);
+    formdata.append('gst_type_mst', gsttype);
+    formdata.append('id', id);
 
     console.log(formdata)
 
@@ -912,7 +916,7 @@ export const Update_Edit_Sales = async (customerid, prodlist, duedate, tax, invo
   }
 };
 
-export const Delete_item_Api = async (id) => {
+export const Delete_item_Api = async (itemid) => {
   try {
     const token = await AsyncStorage.getItem('authToken');
     console.log('Token:', token);
@@ -925,7 +929,8 @@ export const Delete_item_Api = async (id) => {
     myHeaders.append('token', token);
 
     const formdata = new FormData();
-    formdata.append("id", id);
+    formdata.append("id", itemid);
+    console.log(formdata);
 
     const requestOptions = {
       method: 'POST',

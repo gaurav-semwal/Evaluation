@@ -917,7 +917,7 @@ export const Update_Edit_Sales = async (company_id, customerid, prodlist, duedat
 };
 
 export const Delete_item_Api = async (itemid) => {
-  try {
+  try { 
     const token = await AsyncStorage.getItem('authToken');
     console.log('Token:', token);
 

@@ -13,12 +13,12 @@ const Login = ({navigation}) => {
   const [password, setPassword] = useState('');
 
   useEffect(() => {
-    checkForToken();
+    checkForToken(); 
   }, []);
 
   const checkForToken = async () => {
     const token = await AsyncStorage.getItem('authToken');
-    // console.log(token);
+    
     if (token) {
       navigation.navigate('Bottom');
     }
@@ -48,14 +48,14 @@ const Login = ({navigation}) => {
         await AsyncStorage.setItem('address', response.data.address);
 
         Toast.show({
-          text1: 'User login successful',
+          text1: 'Login Successfull',
           type: 'success',
         });
 
         navigation.navigate('Bottom');
       } else {
         Toast.show({
-          text1: 'Failed to login!',
+          text1: 'Failed to login',
           type: 'error',
         });
       }

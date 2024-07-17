@@ -15,6 +15,7 @@ import AddSale from '../screens/AddSale';
 import { Colors } from '../color/Styles';
 import EditAllSale from '../screens/EditAddSale';
 import EditExpense from '../screens/EditExpense';
+import SplashScreen from '../screens/SplashScreen';
 const Stack = createNativeStackNavigator();
 
 const Stacknavigation = () => {
@@ -22,6 +23,11 @@ const Stacknavigation = () => {
     <NavigationContainer>
       <Provider>
         <Stack.Navigator>
+        <Stack.Screen
+            name="Splash"
+            component={SplashScreen}
+            options={{ headerShown: false }}
+          />
         <Stack.Screen
             name="Login"
             component={Login}
